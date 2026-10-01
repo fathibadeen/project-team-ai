@@ -54,7 +54,7 @@ export async function* streamAgent(opts: {
   if (provider === "openai") {
     const res = await fetch(`${GATEWAY}/responses`, {
       method: "POST",
-      signal,
+      signal: signal ?? null,
       headers: {
         Authorization: `Bearer ${lovableKey}`,
         "Content-Type": "application/json",
@@ -81,7 +81,7 @@ export async function* streamAgent(opts: {
     const own = key?.kind === "anthropic";
     const res = await fetch(own ? "https://api.anthropic.com/v1/messages" : `${GATEWAY}/messages`, {
       method: "POST",
-      signal,
+      signal: signal ?? null,
       headers: own
         ? {
             "x-api-key": key!.api_key,
@@ -111,7 +111,7 @@ export async function* streamAgent(opts: {
   const url = custom ? `${key!.base_url.replace(/\/+$/, "")}/chat/completions` : `${GATEWAY}/chat/completions`;
   const res = await fetch(url, {
     method: "POST",
-    signal,
+    signal: signal ?? null,
     headers: {
       Authorization: `Bearer ${custom ? key!.api_key : lovableKey}`,
       "Content-Type": "application/json",

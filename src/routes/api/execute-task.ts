@@ -43,7 +43,7 @@ export const Route = createFileRoute("/api/execute-task")({
               const messages = historyToMessages(history ?? [], agent.name);
               messages.push({
                 role: "user",
-                content: `[القائد - مهمة معتمدة من المستخدم]: ${task.title}\n\n${task.details}\n\n${FORMAT[task.output_type] ?? FORMAT.report}`,
+                content: `[القائد - مهمة معتمدة من المستخدم]: ${task.title}\n\n${task.details}\n\n${FORMAT[task.output_type] ?? FORMAT["report"]}`,
               });
               // merge if needed
               const fixed = messages.reduce<typeof messages>((acc, m) => {
