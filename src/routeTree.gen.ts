@@ -10,33 +10,53 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiDiscussRouteImport } from './routes/api/discuss'
+import { Route as ApiExecuteTaskRouteImport } from './routes/api/execute-task'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiDiscussRoute = ApiDiscussRouteImport.update({
+  id: '/api/discuss',
+  path: '/api/discuss',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiExecuteTaskRoute = ApiExecuteTaskRouteImport.update({
+  id: '/api/execute-task',
+  path: '/api/execute-task',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/discuss': typeof ApiDiscussRoute
+  '/api/execute-task': typeof ApiExecuteTaskRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/discuss': typeof ApiDiscussRoute
+  '/api/execute-task': typeof ApiExecuteTaskRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/discuss': typeof ApiDiscussRoute
+  '/api/execute-task': typeof ApiExecuteTaskRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/api/discuss' | '/api/execute-task'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/api/discuss' | '/api/execute-task'
+  id: '__root__' | '/' | '/api/discuss' | '/api/execute-task'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiDiscussRoute: typeof ApiDiscussRoute
+  ApiExecuteTaskRoute: typeof ApiExecuteTaskRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +68,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/discuss': {
+      id: '/api/discuss'
+      path: '/api/discuss'
+      fullPath: '/api/discuss'
+      preLoaderRoute: typeof ApiDiscussRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/execute-task': {
+      id: '/api/execute-task'
+      path: '/api/execute-task'
+      fullPath: '/api/execute-task'
+      preLoaderRoute: typeof ApiExecuteTaskRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiDiscussRoute: ApiDiscussRoute,
+  ApiExecuteTaskRoute: ApiExecuteTaskRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
