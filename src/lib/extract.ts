@@ -51,7 +51,7 @@ export async function downloadCodeZip(filename: string, content: string) {
   let m;
   let n = 0;
   while ((m = re.exec(content))) {
-    zip.file(m[1].trim(), m[2]);
+    zip.file((m[1] ?? "file").trim(), m[2] ?? "");
     n++;
   }
   if (!n) zip.file("output.md", content);
