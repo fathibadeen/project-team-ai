@@ -17,6 +17,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedKeysRouteImport } from './routes/_authenticated/keys'
 import { Route as ApiDiscussRouteImport } from './routes/api/discuss'
 import { Route as ApiExecuteTaskRouteImport } from './routes/api/execute-task'
+import { Route as AuthenticatedProjectsIdRouteImport } from './routes/_authenticated/projects.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -57,6 +58,11 @@ const ApiExecuteTaskRoute = ApiExecuteTaskRouteImport.update({
   path: '/api/execute-task',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedProjectsIdRoute = AuthenticatedProjectsIdRouteImport.update({
+  id: '/projects/$id',
+  path: '/projects/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/keys': typeof AuthenticatedKeysRoute
   '/api/discuss': typeof ApiDiscussRoute
   '/api/execute-task': typeof ApiExecuteTaskRoute
+  '/projects/$id': typeof AuthenticatedProjectsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/keys': typeof AuthenticatedKeysRoute
   '/api/discuss': typeof ApiDiscussRoute
   '/api/execute-task': typeof ApiExecuteTaskRoute
+  '/projects/$id': typeof AuthenticatedProjectsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -86,6 +94,7 @@ export interface FileRoutesById {
   '/_authenticated/keys': typeof AuthenticatedKeysRoute
   '/api/discuss': typeof ApiDiscussRoute
   '/api/execute-task': typeof ApiExecuteTaskRoute
+  '/_authenticated/projects/$id': typeof AuthenticatedProjectsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -97,6 +106,7 @@ export interface FileRouteTypes {
     | '/keys'
     | '/api/discuss'
     | '/api/execute-task'
+    | '/projects/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -106,6 +116,7 @@ export interface FileRouteTypes {
     | '/keys'
     | '/api/discuss'
     | '/api/execute-task'
+    | '/projects/$id'
   id:
     | '__root__'
     | '/'
@@ -116,6 +127,7 @@ export interface FileRouteTypes {
     | '/_authenticated/keys'
     | '/api/discuss'
     | '/api/execute-task'
+    | '/_authenticated/projects/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -184,6 +196,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiExecuteTaskRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/projects/$id': {
+      id: '/_authenticated/projects/$id'
+      path: '/projects/$id'
+      fullPath: '/projects/$id'
+      preLoaderRoute: typeof AuthenticatedProjectsIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -191,12 +210,14 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAgentsRoute: typeof AuthenticatedAgentsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedKeysRoute: typeof AuthenticatedKeysRoute
+  AuthenticatedProjectsIdRoute: typeof AuthenticatedProjectsIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAgentsRoute: AuthenticatedAgentsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedKeysRoute: AuthenticatedKeysRoute,
+  AuthenticatedProjectsIdRoute: AuthenticatedProjectsIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
