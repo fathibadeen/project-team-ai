@@ -6,6 +6,42 @@ export type ProviderKey = { kind: string; base_url: string; api_key: string } | 
 
 export const BUILTIN_PROVIDERS = ["openai", "anthropic", "google"] as const;
 
+/** Cost/latency ceiling for a single turn. */
+export const MAX_OUTPUT_TOKENS = 2000;
+
+/**
+ * Holds back everything from `sentinel` onwards so a structured tail never reaches the UI,
+ * while still exposing the raw text for parsing. Safe across chunk boundaries: it never emits
+ * the last `sentinel.length - 1` chars until it knows they are not a partial sentinel.
+ */
+export function tailFilter(sentinel: string) {
+  let raw = "";
+  let emitted = 0;
+  let stopped = false;
+  return {
+    push(chunk: string): string {
+      raw += chunk;
+      if (stopped) return "";
+      const idx = raw.indexOf(sentinel);
+      const upTo = idx >= 0 ? idx : raw.length - (sentinel.length - 1);
+      if (idx >= 0) stopped = true;
+      if (upTo <= emitted) return "";
+      const visible = raw.slice(emitted, upTo);
+      emitted = upTo;
+      return visible;
+    },
+    flush(): string {
+      if (stopped || raw.length <= emitted) return "";
+      const rest = raw.slice(emitted);
+      emitted = raw.length;
+      return rest;
+    },
+    get raw() {
+      return raw;
+    },
+  };
+}
+
 async function* sseEvents(res: Response): AsyncGenerator<any> {
   const reader = res.body!.getReader();
   const dec = new TextDecoder();
@@ -47,8 +83,10 @@ export async function* streamAgent(opts: {
   messages: ChatMsg[];
   key: ProviderKey;
   signal?: AbortSignal;
+  maxTokens?: number;
 }): AsyncGenerator<string> {
   const { provider, model, system, messages, key, signal } = opts;
+  const maxTokens = opts.maxTokens ?? MAX_OUTPUT_TOKENS;
   const lovableKey = process.env["LOVABLE_API_KEY"];
 
   if (provider === "openai") {
@@ -66,6 +104,7 @@ export async function* streamAgent(opts: {
         input: messages.map((m) => ({ role: m.role, content: m.content })),
         stream: true,
         store: false,
+        max_output_tokens: maxTokens,
         reasoning: { effort: "low" },
       }),
     });
@@ -93,7 +132,7 @@ export async function* streamAgent(opts: {
             "Content-Type": "application/json",
             "X-Lovable-AIG-SDK": "fetch",
           },
-      body: JSON.stringify({ model, max_tokens: 8000, system, messages, stream: true }),
+      body: JSON.stringify({ model, max_tokens: maxTokens, system, messages, stream: true }),
     });
     await ensureOk(res, "Claude");
     for await (const ev of sseEvents(res)) {
@@ -120,6 +159,7 @@ export async function* streamAgent(opts: {
     body: JSON.stringify({
       model,
       messages: [{ role: "system", content: system }, ...messages],
+      max_tokens: maxTokens,
       stream: true,
     }),
   });

@@ -107,6 +107,65 @@ export type Database = {
           },
         ]
       }
+      discussion_runs: {
+        Row: {
+          created_at: string
+          error: string | null
+          id: string
+          max_rounds: number
+          participants: string[]
+          pending: string[]
+          phase: string
+          project_id: string
+          prompt: string
+          round: number
+          status: string
+          steps_done: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          max_rounds?: number
+          participants?: string[]
+          pending?: string[]
+          phase?: string
+          project_id: string
+          prompt: string
+          round?: number
+          status?: string
+          steps_done?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          max_rounds?: number
+          participants?: string[]
+          pending?: string[]
+          phase?: string
+          project_id?: string
+          prompt?: string
+          round?: number
+          status?: string
+          steps_done?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discussion_runs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           agent_id: string | null
@@ -114,7 +173,13 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          key_points: string[]
+          kind: string
           project_id: string
+          round: number | null
+          run_id: string | null
+          stance: string | null
+          targets: string[]
           user_id: string
         }
         Insert: {
@@ -123,7 +188,13 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          key_points?: string[]
+          kind?: string
           project_id: string
+          round?: number | null
+          run_id?: string | null
+          stance?: string | null
+          targets?: string[]
           user_id?: string
         }
         Update: {
@@ -132,7 +203,13 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          key_points?: string[]
+          kind?: string
           project_id?: string
+          round?: number | null
+          run_id?: string | null
+          stance?: string | null
+          targets?: string[]
           user_id?: string
         }
         Relationships: [
@@ -148,6 +225,13 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "discussion_runs"
             referencedColumns: ["id"]
           },
         ]

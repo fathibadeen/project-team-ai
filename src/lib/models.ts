@@ -27,6 +27,10 @@ export const KEY_PRESETS: Record<string, { base_url: string; model: string }> = 
   DeepSeek: { base_url: "https://api.deepseek.com/v1", model: "deepseek-chat" },
   OpenAI: { base_url: "https://api.openai.com/v1", model: "gpt-4o" },
   Groq: { base_url: "https://api.groq.com/openai/v1", model: "llama-3.3-70b-versatile" },
+  AgentRouter: {
+  base_url: "https://agentrouter.org/v1",
+  model: "deepseek-v4-flash"
+},
 };
 
 export const AGENT_COLORS = ["#d4a24c", "#4ca3d4", "#5cc48a", "#d46a6a", "#a07ad4", "#d4884c", "#4cc4bd", "#c4c44c"];

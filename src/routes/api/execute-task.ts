@@ -1,9 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { streamAgent } from "@/lib/ai.server";
-import { authFromRequest, loadKey, projectContext, agentSystem, historyToMessages, type Agent } from "@/lib/council.server";
+import {
+  authFromRequest,
+  loadKey,
+  projectContext,
+  agentSystem,
+  historyToMessages,
+  type Agent,
+  type HistoryRow,
+} from "@/lib/council.server";
 
 const Body = z.object({ taskId: z.string().uuid() });
+
+const HISTORY_COLUMNS = "agent_id, agent_name, content, kind, round, run_id, stance, targets, key_points";
 
 const FORMAT: Record<string, string> = {
   report: "اكتب تقريراً منظماً بصيغة Markdown بعناوين واضحة.",
@@ -24,14 +34,21 @@ export const Route = createFileRoute("/api/execute-task")({
         const { data: task } = await supabase.from("tasks").select("*").eq("id", parsed.data.taskId).maybeSingle();
         if (!task || !task.agent_id) return new Response("Not found", { status: 404 });
         if (task.status !== "approved") return new Response("Task not approved", { status: 409 });
-        const [{ data: project }, { data: agent }, { data: files }, { data: history }] = await Promise.all([
+        const [{ data: project }, { data: agent }, { data: files }, { data: newest }] = await Promise.all([
           supabase.from("projects").select("*").eq("id", task.project_id).single(),
           supabase.from("agents").select("*").eq("id", task.agent_id).single(),
           supabase.from("project_files").select("name, content").eq("project_id", task.project_id),
-          supabase.from("messages").select("agent_name, content").eq("project_id", task.project_id).order("created_at").limit(40),
+          // newest 40, flipped below — ascending+limit would hand the agent the oldest messages instead
+          supabase
+            .from("messages")
+            .select(HISTORY_COLUMNS)
+            .eq("project_id", task.project_id)
+            .order("created_at", { ascending: false })
+            .limit(40),
         ]);
         if (!project || !agent) return new Response("Not found", { status: 404 });
         const { data: team } = await supabase.from("agents").select("*").in("id", project.agent_ids);
+        const history = ((newest ?? []) as HistoryRow[]).slice().reverse();
         await supabase.from("tasks").update({ status: "running" }).eq("id", task.id);
 
         const enc = new TextEncoder();
@@ -40,7 +57,7 @@ export const Route = createFileRoute("/api/execute-task")({
             let text = "";
             try {
               const key = await loadKey(userId, agent.provider_key_id);
-              const messages = historyToMessages(history ?? [], agent.name);
+              const messages = historyToMessages(history, agent.name, (team ?? []) as Agent[]);
               messages.push({
                 role: "user",
                 content: `[القائد - مهمة معتمدة من المستخدم]: ${task.title}\n\n${task.details}\n\n${FORMAT[task.output_type] ?? FORMAT["report"]}`,
@@ -59,6 +76,8 @@ export const Route = createFileRoute("/api/execute-task")({
                 messages: fixed,
                 key,
                 signal: request.signal,
+                // artifacts are full documents, so they keep the old wide ceiling instead of the per-turn one
+                maxTokens: 8000,
               })) {
                 text += t;
                 controller.enqueue(enc.encode(t));
