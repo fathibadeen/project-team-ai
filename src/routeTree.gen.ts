@@ -10,13 +10,43 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedAgentsRouteImport } from './routes/_authenticated/agents'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedKeysRouteImport } from './routes/_authenticated/keys'
 import { Route as ApiDiscussRouteImport } from './routes/api/discuss'
 import { Route as ApiExecuteTaskRouteImport } from './routes/api/execute-task'
+import { Route as AuthenticatedProjectsIdRouteImport } from './routes/_authenticated/projects.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAgentsRoute = AuthenticatedAgentsRouteImport.update({
+  id: '/agents',
+  path: '/agents',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedKeysRoute = AuthenticatedKeysRouteImport.update({
+  id: '/keys',
+  path: '/keys',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const ApiDiscussRoute = ApiDiscussRouteImport.update({
   id: '/api/discuss',
@@ -28,33 +58,82 @@ const ApiExecuteTaskRoute = ApiExecuteTaskRouteImport.update({
   path: '/api/execute-task',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedProjectsIdRoute = AuthenticatedProjectsIdRouteImport.update({
+  id: '/projects/$id',
+  path: '/projects/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/agents': typeof AuthenticatedAgentsRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/keys': typeof AuthenticatedKeysRoute
   '/api/discuss': typeof ApiDiscussRoute
   '/api/execute-task': typeof ApiExecuteTaskRoute
+  '/projects/$id': typeof AuthenticatedProjectsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/agents': typeof AuthenticatedAgentsRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/keys': typeof AuthenticatedKeysRoute
   '/api/discuss': typeof ApiDiscussRoute
   '/api/execute-task': typeof ApiExecuteTaskRoute
+  '/projects/$id': typeof AuthenticatedProjectsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/agents': typeof AuthenticatedAgentsRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/keys': typeof AuthenticatedKeysRoute
   '/api/discuss': typeof ApiDiscussRoute
   '/api/execute-task': typeof ApiExecuteTaskRoute
+  '/_authenticated/projects/$id': typeof AuthenticatedProjectsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/discuss' | '/api/execute-task'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/agents'
+    | '/dashboard'
+    | '/keys'
+    | '/api/discuss'
+    | '/api/execute-task'
+    | '/projects/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/discuss' | '/api/execute-task'
-  id: '__root__' | '/' | '/api/discuss' | '/api/execute-task'
+  to:
+    | '/'
+    | '/auth'
+    | '/agents'
+    | '/dashboard'
+    | '/keys'
+    | '/api/discuss'
+    | '/api/execute-task'
+    | '/projects/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/agents'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/keys'
+    | '/api/discuss'
+    | '/api/execute-task'
+    | '/_authenticated/projects/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
   ApiDiscussRoute: typeof ApiDiscussRoute
   ApiExecuteTaskRoute: typeof ApiExecuteTaskRoute
 }
@@ -67,6 +146,41 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/agents': {
+      id: '/_authenticated/agents'
+      path: '/agents'
+      fullPath: '/agents'
+      preLoaderRoute: typeof AuthenticatedAgentsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/keys': {
+      id: '/_authenticated/keys'
+      path: '/keys'
+      fullPath: '/keys'
+      preLoaderRoute: typeof AuthenticatedKeysRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/api/discuss': {
       id: '/api/discuss'
@@ -82,11 +196,37 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiExecuteTaskRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/projects/$id': {
+      id: '/_authenticated/projects/$id'
+      path: '/projects/$id'
+      fullPath: '/projects/$id'
+      preLoaderRoute: typeof AuthenticatedProjectsIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAgentsRoute: typeof AuthenticatedAgentsRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedKeysRoute: typeof AuthenticatedKeysRoute
+  AuthenticatedProjectsIdRoute: typeof AuthenticatedProjectsIdRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAgentsRoute: AuthenticatedAgentsRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedKeysRoute: AuthenticatedKeysRoute,
+  AuthenticatedProjectsIdRoute: AuthenticatedProjectsIdRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
   ApiDiscussRoute: ApiDiscussRoute,
   ApiExecuteTaskRoute: ApiExecuteTaskRoute,
 }
