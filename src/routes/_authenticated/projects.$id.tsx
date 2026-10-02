@@ -56,7 +56,7 @@ function ProjectPage() {
 
   async function discuss() {
     if (!prompt.trim() || busy) return;
-    if (!team.length) return toast.error("أضف وكلاء لهذا المشروع أولاً");
+    if (!team.length) { toast.error("أضف وكلاء لهذا المشروع أولاً"); return; }
     setBusy(true);
     const p = prompt; setPrompt("");
     let cur: Live = null;
@@ -192,7 +192,7 @@ function ProjectPage() {
   );
 }
 
-function Bubble({ name, color, text }: { name: string | null; color?: string; text: string }) {
+function Bubble({ name, color, text }: { name: string | null; color?: string | undefined; text: string }) {
   const user = !name;
   return (
     <div className={`rounded-lg p-3 ${user ? "mr-auto max-w-[85%] bg-primary/15" : "bg-muted"}`} style={user ? {} : { borderRight: `3px solid ${color ?? "currentColor"}` }}>

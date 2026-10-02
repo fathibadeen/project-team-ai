@@ -20,7 +20,7 @@ export async function extractText(file: File): Promise<string> {
     const JSZip = (await import("jszip")).default;
     const zip = await JSZip.loadAsync(await file.arrayBuffer());
     let out = "";
-    for (const [path, entry] of Object.entries(zip.files)) {
+    for (const [path, entry] of Object.entries(zip.files) as [string, any][]) {
       if (entry.dir || SKIP.test(path) || !TEXT_EXT.test(path)) continue;
       if (out.length > LIMIT) break;
       const c = await entry.async("string");

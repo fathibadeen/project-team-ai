@@ -42,7 +42,7 @@ function Agents() {
     const { error } = id
       ? await supabase.from("agents").update(row).eq("id", id)
       : await supabase.from("agents").insert({ ...row, user_id: uid });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     setForm(null);
     qc.invalidateQueries({ queryKey: ["agents"] });
   }
