@@ -33,7 +33,7 @@ function Dashboard() {
     const { error } = await supabase.from("projects").insert({
       title, description: desc, agent_ids: picked, user_id: u.user!.id,
     });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     setOpen(false); setTitle(""); setDesc(""); setPicked([]);
     qc.invalidateQueries({ queryKey: ["projects"] });
   }

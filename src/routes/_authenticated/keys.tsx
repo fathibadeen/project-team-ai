@@ -28,7 +28,7 @@ function Keys() {
   async function save() {
     const { data: u } = await supabase.auth.getUser();
     const { error } = await supabase.from("provider_keys").insert({ label, kind, base_url: baseUrl, api_key: apiKey, user_id: u.user!.id });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     setApiKey("");
     toast.success("تم حفظ المفتاح");
     qc.invalidateQueries({ queryKey: ["keys"] });
